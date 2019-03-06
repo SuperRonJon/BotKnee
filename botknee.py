@@ -34,9 +34,13 @@ async def on_message(message):
 
     if message.channel == sub_channel:
         print('Got message from {}#{}'.format(message.author.name, message.author.discriminator))
-        if message.content.startswith('!q') or message.content.startswith('!Q'):
-            current_queue.append(message.author)
-            await client.send_message(message.channel, "Added {} to the queue".format(message.author.mention))
+
+        if message.content.startswith('!q') or message.content.startswith('!Q') or message.content.startswith('!queue') or message.content.startswith('!Queue'):
+            if message.author not in current_queue:
+                current_queue.append(message.author)
+                await client.send_message(message.channel, "Added {} to the queue".format(message.author.mention))
+            else:
+                await client.send_message(message.channel, "{} is already in the queue".format(message.author.mention))
 
         if message.content.startswith('!list'):
             user_mentions = ''
@@ -76,9 +80,19 @@ async def on_message(message):
                 await client.send_message(message.channel, 'You must be a moderator to get the next users')
 
         if message.content.startswith('!reset'):
-            current_queue = list()
-            await client.send_message(message.channel, 'Queue reset')
+            user_roles = [str(role).lower() for role in message.author.roles]
+            if 'moderator' in user_roles:
+                current_queue = list()
+                await client.send_message(message.channel, 'Queue reset')
+            else:
+                await client.send_message(message.channel, 'Only moderators can reset the queue')
+        
+        if message.content.startswith('!close'):
+            user_roles = [str(role).lower() for role in message.author.roles]
+            if 'moderator' in user_roles:
+                client.close()
     else:
         return
+
 
 client.run(token)
