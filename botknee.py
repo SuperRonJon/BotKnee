@@ -55,7 +55,7 @@ async def on_message(message):
 
             if in_queue > 0:
                 for user in current_queue:
-                    user_mentions += user.mention + ' '
+                    user_mentions += user.name + ', '
                 await client.send_message(message.channel, 'There are currently {} users in queue'.format(in_queue))
                 await client.send_message(message.channel, user_mentions)
             else:
