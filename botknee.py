@@ -42,13 +42,20 @@ async def on_message(message):
             else:
                 await client.send_message(message.channel, "{} is already in the queue".format(message.author.mention))
 
+        if message.content.startswith('!remove'):
+            if message.author in current_queue:
+                current_queue.remove(message.author)
+                await client.send_message(message.channel, "Removed {} from the queue".format(message.author.mention))
+            else:
+                await client.send_message(message.channel, "You can only remove yourself from the queue if you are in the queue...")
+
         if message.content.startswith('!list'):
             user_mentions = ''
             in_queue = len(current_queue)
 
             if in_queue > 0:
                 for user in current_queue:
-                    user_mentions += user.mention + ' '
+                    user_mentions += user.name + ', '
                 await client.send_message(message.channel, 'There are currently {} users in queue'.format(in_queue))
                 await client.send_message(message.channel, user_mentions)
             else:
