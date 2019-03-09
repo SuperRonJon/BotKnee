@@ -18,7 +18,7 @@ async def on_ready():
     print('------')
     channels = client.get_all_channels()
     for channel in channels:
-        if 'subscribers' in channel.name:
+        if 'sub-games' in channel.name:
             print('Found sub channel...')
             sub_channel = channel
 
