@@ -60,6 +60,7 @@ async def on_message(message):
                 content_split = message.content.split(' ')
                 if len(content_split) == 2:
                     num_to_remove = int(content_split[1])
+                    await client.send_message(message.channel, "Number of players per match changed to {}".format(content_split[1]))
                 else:
                     await client.send_message(message.channel, "Error, invalid input for !number command")
             else:
@@ -70,12 +71,15 @@ async def on_message(message):
             if 'moderator' in user_roles:
                 next_users = list()
                 for x in range(num_to_remove):
-                    next_users.append(current_queue.pop(0))
+                    if len(current_queue > 0):
+                        next_users.append(current_queue.pop(0))
                 user_mentions = ""
                 for user in next_users:
                     user_mentions += user.mention + " "
-
-                await client.send_message(message.channel, "Next up: {}".format(user_mentions))
+                if user_mentions == "":
+                    await client.send_message(message.channel, "There is nobody in the Queue!")
+                else:
+                    await client.send_message(message.channel, "Next up: {}".format(user_mentions))
             else:
                 await client.send_message(message.channel, 'You must be a moderator to get the next users')
 
