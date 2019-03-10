@@ -78,7 +78,7 @@ async def on_message(message):
             if 'moderator' in user_roles:
                 next_users = list()
                 for x in range(num_to_remove):
-                    if len(current_queue > 0):
+                    if len(current_queue) > 0:
                         next_users.append(current_queue.pop(0))
                 user_mentions = ""
                 for user in next_users:
