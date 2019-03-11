@@ -41,6 +41,36 @@ async def on_message(message):
                 await client.send_message(message.channel, "Added {} to the queue".format(message.author.mention))
             else:
                 await client.send_message(message.channel, "{} is already in the queue".format(message.author.mention))
+        
+        if message.content.startswith('!adduser'):
+            user_roles = [str(role).lower() for role in message.author.roles]
+            if 'moderator' in user_roles:
+                if len(message.mentions) != 1:
+                    await client.send_message(message.channel, "Invalid number of users mentioned, must be just 1")
+                else:
+                    player_to_add = message.mentions[0]
+                    if player_to_add not in current_queue:
+                        current_queue.append(player_to_add)
+                        await client.send_message(message.channel, "Added {} to the queue".format(player_to_add.mention))
+                    else:
+                        await client.send_message(message.channel, "Player is already in the queue")
+            else:
+                await client.send_message(message.channel, "Only moderators can use this command")
+
+        if message.content.startswith('!tofront'):
+            user_roles = [str(role).lower() for role in message.author.roles]
+            if 'moderator' in user_roles:
+                if len(message.mentions) > 1:
+                    await client.send_message(message.channel, "Too many people mentioned")
+                else:
+                    player_to_move = message.mentions[0]
+                    if player_to_move in current_queue:
+                        current_queue.remove(player_to_move)
+                        current_queue.insert(0, player_to_move)
+                        await client.send_message(message.channel, "{} has been moved to the front of the queue".format(player_to_move.mention))
+                    else:
+                        await client.send_message(message.channel, "Player not in queue")
+
 
         if message.content.startswith('!remove'):
             if message.author in current_queue:
