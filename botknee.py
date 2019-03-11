@@ -57,10 +57,23 @@ async def on_message(message):
             else:
                 await client.send_message(message.channel, "Only moderators can use this command")
 
+        if message.content.startswith('!removeuser'):
+            user_roles = [str(role).lower() for role in message.author.roles]
+            if 'moderator' in user_roles:
+                if len(message.mentions) != 1:
+                    await client.send_message(message.channel, "Invalid number of users mentioned, must be just 1")
+                else:
+                    player_to_remove = message.mentions[0]
+                    if player_to_remove in current_queue:
+                        current_queue.remove(player_to_remove)
+                        await client.send_message(message.channel, "{} has been removed from the queue".format(player_to_remove.mention))
+                    else:
+                        await client.send_message(message.channel, "Player not in current queue, cannot remove")
+
         if message.content.startswith('!tofront'):
             user_roles = [str(role).lower() for role in message.author.roles]
             if 'moderator' in user_roles:
-                if len(message.mentions) > 1:
+                if len(message.mentions) != 1:
                     await client.send_message(message.channel, "Too many people mentioned")
                 else:
                     player_to_move = message.mentions[0]
