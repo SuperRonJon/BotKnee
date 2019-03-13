@@ -19,7 +19,7 @@ async def on_ready():
     channels = client.get_all_channels()
     for channel in channels:
         if 'sub-games' in channel.name:
-            print('Found sub channel...')
+            print('listening in {}'.format(channel.name))
             sub_channel = channel
 
 
@@ -33,12 +33,11 @@ async def on_message(message):
         return
 
     if message.channel == sub_channel:
-        print('Got message from {}#{}'.format(message.author.name, message.author.discriminator))
-
         if message.content.startswith('!q') or message.content.startswith('!Q') or message.content.startswith('!queue') or message.content.startswith('!Queue'):
             if message.author not in current_queue:
                 current_queue.append(message.author)
                 await client.send_message(message.channel, "Added {} to the queue".format(message.author.mention))
+                print('{}#{} added self to queue'.format(message.author.name, message.author.discriminator))
             else:
                 await client.send_message(message.channel, "{} is already in the queue".format(message.author.mention))
         
@@ -52,6 +51,7 @@ async def on_message(message):
                     if player_to_add not in current_queue:
                         current_queue.append(player_to_add)
                         await client.send_message(message.channel, "Added {} to the queue".format(player_to_add.mention))
+                        print('{}#{} added {}#{} to queue'.format(message.author.name, message.author.discriminator, player_to_add.name, player_to_add.discriminator))
                     else:
                         await client.send_message(message.channel, "Player is already in the queue")
             else:
@@ -61,12 +61,13 @@ async def on_message(message):
             user_roles = [str(role).lower() for role in message.author.roles]
             if 'moderator' in user_roles:
                 if len(message.mentions) != 1:
-                    await client.send_message(message.channel, "Invalid number of users mentioned, must be just 1")
+                    await client.send_message(message.channel, "Invalid number of users mentioned")
                 else:
                     player_to_remove = message.mentions[0]
                     if player_to_remove in current_queue:
                         current_queue.remove(player_to_remove)
                         await client.send_message(message.channel, "{} has been removed from the queue".format(player_to_remove.mention))
+                        print('{}#{} removed {}#{} from the queue'.format(message.author.name, message.author.discriminator, player_to_remove.name, player_to_remove.discriminator))
                     else:
                         await client.send_message(message.channel, "Player not in current queue, cannot remove")
 
@@ -81,6 +82,7 @@ async def on_message(message):
                         current_queue.remove(player_to_move)
                         current_queue.insert(0, player_to_move)
                         await client.send_message(message.channel, "{} has been moved to the front of the queue".format(player_to_move.mention))
+                        print('{}#{} moved {}#{} to the front of the queue'.format(message.author.name, message.author.discriminator, player_to_move.name, player_to_move.discriminator))
                     else:
                         await client.send_message(message.channel, "Player not in queue")
 
@@ -89,6 +91,7 @@ async def on_message(message):
             if message.author in current_queue:
                 current_queue.remove(message.author)
                 await client.send_message(message.channel, "Removed {} from the queue".format(message.author.mention))
+                print('{}#{} removed self from the queue'.format(message.author.name, message.author.discriminator))
             else:
                 await client.send_message(message.channel, "You can only remove yourself from the queue if you are in the queue...")
 
@@ -111,6 +114,7 @@ async def on_message(message):
                 if len(content_split) == 2:
                     num_to_remove = int(content_split[1])
                     await client.send_message(message.channel, "Number of players per match changed to {}".format(content_split[1]))
+                    print('{}#{} changed number of players to {}'.format(message.author.name, message.author.discriminator, content_split[1]))
                 else:
                     await client.send_message(message.channel, "Error, invalid input for !number command")
             else:
@@ -138,13 +142,15 @@ async def on_message(message):
             if 'moderator' in user_roles:
                 current_queue = list()
                 await client.send_message(message.channel, 'Queue reset')
+                print('{}#{} reset the queue'.format(message.author.name, message.author.discriminator))
             else:
                 await client.send_message(message.channel, 'Only moderators can reset the queue')
         
         if message.content.startswith('!close'):
             user_roles = [str(role).lower() for role in message.author.roles]
             if 'moderator' in user_roles:
-                client.close()
+                print('Closing....')
+                await client.logout()
     else:
         return
 
