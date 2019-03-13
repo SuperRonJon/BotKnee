@@ -57,7 +57,7 @@ async def on_message(message):
             else:
                 await client.send_message(message.channel, "Only moderators can use this command")
 
-        if message.content.startswith('!removeuser'):
+        if message.content.startswith('!remuser'):
             user_roles = [str(role).lower() for role in message.author.roles]
             if 'moderator' in user_roles:
                 if len(message.mentions) != 1:
