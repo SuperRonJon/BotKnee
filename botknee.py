@@ -114,7 +114,7 @@ async def on_message(message):
                                 del swap_dict[message.author.name]
                         else:
                             swap_dict[message.author.name] = swap_with.name
-                            await client.send_message(message.channel, "Initiating swap with {}".format(swap_with))
+                            await client.send_message(message.channel, "Initiating swap with {}".format(swap_with.mention))
                     else:
                         await client.send_message(message.channel, "That user is not in the queue")
 
@@ -122,6 +122,21 @@ async def on_message(message):
                     await client.send_message(message.channel, "Nobody mentioned to swap")
             else:
                 await client.send_message(message.channel, "You must be in the queue to swap")
+        
+        if message.content.startswith('!swapusers'):
+            user_roles = [str(role).lower() for role in message.author.roles]
+            if 'moderator' in user_roles:
+                if len(message.mentions) == 2 and message.mentions[0] in current_queue and message.mentions[1] in current_queue:
+                    swap1 = message.mentions[0]
+                    swap2 = message.mentions[1]
+
+                    a, b = current_queue.index(swap1), current_queue.index(swap2)
+                    current_queue[b], current_queue[a] = current_queue[a], current_queue[b]
+                    await client.send_message(message.channel, "Successfully swapped {} and {}".format(swap1.mention, swap2.mention))
+                else:
+                    await client.send_message(message.channel, "Error swapping users")
+            else:
+                await client.send_message(message.channel, "You must be a moderator to swap other users")
 
         if message.content.startswith('!list'):
             user_mentions = ''
