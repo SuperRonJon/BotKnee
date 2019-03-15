@@ -7,6 +7,8 @@ sub_channel = None
 current_queue = list()
 num_to_remove = 3
 
+swap_dict = dict()
+
 
 @client.event
 async def on_ready():
@@ -28,6 +30,7 @@ async def on_message(message):
     global current_queue
     global num_to_remove
     global sub_channel
+    global swap_dict
 
     if message.author == client.user:
         return
@@ -77,6 +80,7 @@ async def on_message(message):
                 if len(message.mentions) != 1:
                     await client.send_message(message.channel, "Too many people mentioned")
                 else:
+                    # TODO: Make sure someone is mentioned
                     player_to_move = message.mentions[0]
                     if player_to_move in current_queue:
                         current_queue.remove(player_to_move)
@@ -94,6 +98,30 @@ async def on_message(message):
                 print('{}#{} removed self from the queue'.format(message.author.name, message.author.discriminator))
             else:
                 await client.send_message(message.channel, "You can only remove yourself from the queue if you are in the queue...")
+        
+        if message.content.startswith('!swap '):
+            print('Default swap')
+            if message.author in current_queue:
+                if len(message.mentions) > 0:
+                    swap_with = message.mentions[0]
+                    if swap_with in current_queue:
+                        if swap_with.name in swap_dict and swap_dict[swap_with.name] == message.author.name:
+                            a, b = current_queue.index(message.author), current_queue.index(swap_with)
+                            current_queue[b], current_queue[a] = current_queue[a], current_queue[b]
+                            await client.send_message(message.channel, "Successfully swapped {} and {}".format(message.author.mention, swap_with.mention))
+                            del swap_dict[swap_with.name]
+                            if message.author.name in swap_dict:
+                                del swap_dict[message.author.name]
+                        else:
+                            swap_dict[message.author.name] = swap_with.name
+                            await client.send_message(message.channel, "Initiating swap with {}".format(swap_with))
+                    else:
+                        await client.send_message(message.channel, "That user is not in the queue")
+
+                else:
+                    await client.send_message(message.channel, "Nobody mentioned to swap")
+            else:
+                await client.send_message(message.channel, "You must be in the queue to swap")
 
         if message.content.startswith('!list'):
             user_mentions = ''
