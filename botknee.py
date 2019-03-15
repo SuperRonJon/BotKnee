@@ -5,6 +5,7 @@ client = discord.Client()
 sub_channel = None
 
 current_queue = list()
+is_open = True
 num_to_remove = 3
 
 swap_dict = dict()
@@ -31,18 +32,22 @@ async def on_message(message):
     global num_to_remove
     global sub_channel
     global swap_dict
+    global is_open
 
     if message.author == client.user:
         return
 
     if message.channel.name == 'sub-games':
         if message.content.startswith('!q') or message.content.startswith('!Q') or message.content.startswith('!queue') or message.content.startswith('!Queue'):
-            if message.author not in current_queue:
-                current_queue.append(message.author)
-                await client.send_message(message.channel, "Added {} to the queue".format(message.author.mention))
-                print('{}#{} added self to queue'.format(message.author.name, message.author.discriminator))
+            if is_open:
+                if message.author not in current_queue:
+                    current_queue.append(message.author)
+                    await client.send_message(message.channel, "Added {} to the queue".format(message.author.mention))
+                    print('{}#{} added self to queue'.format(message.author.name, message.author.discriminator))
+                else:
+                    await client.send_message(message.channel, "{} is already in the queue".format(message.author.mention))
             else:
-                await client.send_message(message.channel, "{} is already in the queue".format(message.author.mention))
+                await client.send_message(message.channel, "Sorry, the queue is currently closed.")
         
         if message.content.startswith('!adduser'):
             user_roles = [str(role).lower() for role in message.author.roles]
@@ -190,6 +195,22 @@ async def on_message(message):
                 await client.send_message(message.channel, 'Only moderators can reset the queue')
         
         if message.content.startswith('!close'):
+            user_roles = [str(role).lower() for role in message.author.roles]
+            if 'moderator' in user_roles:
+                is_open = False
+                await client.send_message(message.channel, 'The queue is now CLOSED! You may no longer join the queue.')
+            else:
+                await client.send_message(message.channel, 'You must be a moderator to use this command')
+        
+        if message.content.startswith('!open'):
+            user_roles = [str(role).lower() for role in message.author.roles]
+            if 'moderator' in user_roles:
+                is_open = True
+                await client.send_message(message.channel, 'The queue is now OPEN! You may join the queue again.')
+            else:
+                await client.send_message(message.channel, 'You must be a moderator to use this command')
+        
+        if message.content.startswith('!logout'):
             user_roles = [str(role).lower() for role in message.author.roles]
             if 'moderator' in user_roles:
                 print('Closing....')
