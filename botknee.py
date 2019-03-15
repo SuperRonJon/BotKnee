@@ -32,7 +32,7 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if message.channel == sub_channel:
+    if message.channel.name == 'sub-games':
         if message.content.startswith('!q') or message.content.startswith('!Q') or message.content.startswith('!queue') or message.content.startswith('!Queue'):
             if message.author not in current_queue:
                 current_queue.append(message.author)
