@@ -38,17 +38,19 @@ async def on_message(message):
         return
 
     if message.channel.name == 'sub-games':
-        if message.content.startswith('!q') or message.content.startswith('!Q') or message.content.startswith('!queue') or message.content.startswith('!Queue'):
+        if message.content.startswith('!q') or message.content.startswith('!Q') or message.content.startswith(
+                '!queue') or message.content.startswith('!Queue'):
             if is_open:
                 if message.author not in current_queue:
                     current_queue.append(message.author)
                     await client.send_message(message.channel, "Added {} to the queue".format(message.author.mention))
                     print('{}#{} added self to queue'.format(message.author.name, message.author.discriminator))
                 else:
-                    await client.send_message(message.channel, "{} is already in the queue".format(message.author.mention))
+                    await client.send_message(message.channel,
+                                              "{} is already in the queue".format(message.author.mention))
             else:
                 await client.send_message(message.channel, "Sorry, the queue is currently closed.")
-        
+
         if message.content.startswith('!adduser'):
             user_roles = [str(role).lower() for role in message.author.roles]
             if 'moderator' in user_roles:
@@ -58,8 +60,10 @@ async def on_message(message):
                     player_to_add = message.mentions[0]
                     if player_to_add not in current_queue:
                         current_queue.append(player_to_add)
-                        await client.send_message(message.channel, "Added {} to the queue".format(player_to_add.mention))
-                        print('{}#{} added {}#{} to queue'.format(message.author.name, message.author.discriminator, player_to_add.name, player_to_add.discriminator))
+                        await client.send_message(message.channel,
+                                                  "Added {} to the queue".format(player_to_add.mention))
+                        print('{}#{} added {}#{} to queue'.format(message.author.name, message.author.discriminator,
+                                                                  player_to_add.name, player_to_add.discriminator))
                     else:
                         await client.send_message(message.channel, "Player is already in the queue")
             else:
@@ -74,8 +78,12 @@ async def on_message(message):
                     player_to_remove = message.mentions[0]
                     if player_to_remove in current_queue:
                         current_queue.remove(player_to_remove)
-                        await client.send_message(message.channel, "{} has been removed from the queue".format(player_to_remove.mention))
-                        print('{}#{} removed {}#{} from the queue'.format(message.author.name, message.author.discriminator, player_to_remove.name, player_to_remove.discriminator))
+                        await client.send_message(message.channel,
+                                                  "{} has been removed from the queue".format(player_to_remove.mention))
+                        print('{}#{} removed {}#{} from the queue'.format(message.author.name,
+                                                                          message.author.discriminator,
+                                                                          player_to_remove.name,
+                                                                          player_to_remove.discriminator))
                     else:
                         await client.send_message(message.channel, "Player not in current queue, cannot remove")
 
@@ -90,11 +98,14 @@ async def on_message(message):
                     if player_to_move in current_queue:
                         current_queue.remove(player_to_move)
                         current_queue.insert(0, player_to_move)
-                        await client.send_message(message.channel, "{} has been moved to the front of the queue".format(player_to_move.mention))
-                        print('{}#{} moved {}#{} to the front of the queue'.format(message.author.name, message.author.discriminator, player_to_move.name, player_to_move.discriminator))
+                        await client.send_message(message.channel, "{} has been moved to the front of the queue".format(
+                            player_to_move.mention))
+                        print('{}#{} moved {}#{} to the front of the queue'.format(message.author.name,
+                                                                                   message.author.discriminator,
+                                                                                   player_to_move.name,
+                                                                                   player_to_move.discriminator))
                     else:
                         await client.send_message(message.channel, "Player not in queue")
-
 
         if message.content.startswith('!remove'):
             if message.author in current_queue:
@@ -102,10 +113,10 @@ async def on_message(message):
                 await client.send_message(message.channel, "Removed {} from the queue".format(message.author.mention))
                 print('{}#{} removed self from the queue'.format(message.author.name, message.author.discriminator))
             else:
-                await client.send_message(message.channel, "You can only remove yourself from the queue if you are in the queue...")
-        
+                await client.send_message(message.channel,
+                                          "You can only remove yourself from the queue if you are in the queue...")
+
         if message.content.startswith('!swap '):
-            print('Default swap')
             if message.author in current_queue:
                 if len(message.mentions) > 0:
                     swap_with = message.mentions[0]
@@ -113,13 +124,18 @@ async def on_message(message):
                         if swap_with.name in swap_dict and swap_dict[swap_with.name] == message.author.name:
                             a, b = current_queue.index(message.author), current_queue.index(swap_with)
                             current_queue[b], current_queue[a] = current_queue[a], current_queue[b]
-                            await client.send_message(message.channel, "Successfully swapped {} and {}".format(message.author.mention, swap_with.mention))
+                            await client.send_message(message.channel,
+                                                      "Successfully swapped {} and {}".format(message.author.mention,
+                                                                                              swap_with.mention))
+                            print("{} has swapped with {}".format(message.author, swap_with))
                             del swap_dict[swap_with.name]
                             if message.author.name in swap_dict:
                                 del swap_dict[message.author.name]
                         else:
                             swap_dict[message.author.name] = swap_with.name
-                            await client.send_message(message.channel, "Initiating swap with {}".format(swap_with.mention))
+                            await client.send_message(message.channel,
+                                                      "Initiating swap with {}".format(swap_with.mention))
+                            print("{} initiating swap with {}".format(message.author, swap_with))
                     else:
                         await client.send_message(message.channel, "That user is not in the queue")
 
@@ -127,17 +143,19 @@ async def on_message(message):
                     await client.send_message(message.channel, "Nobody mentioned to swap")
             else:
                 await client.send_message(message.channel, "You must be in the queue to swap")
-        
+
         if message.content.startswith('!swapusers'):
             user_roles = [str(role).lower() for role in message.author.roles]
             if 'moderator' in user_roles:
-                if len(message.mentions) == 2 and message.mentions[0] in current_queue and message.mentions[1] in current_queue:
+                if len(message.mentions) == 2 and message.mentions[0] in current_queue and message.mentions[
+                    1] in current_queue:
                     swap1 = message.mentions[0]
                     swap2 = message.mentions[1]
 
                     a, b = current_queue.index(swap1), current_queue.index(swap2)
                     current_queue[b], current_queue[a] = current_queue[a], current_queue[b]
-                    await client.send_message(message.channel, "Successfully swapped {} and {}".format(swap1.mention, swap2.mention))
+                    await client.send_message(message.channel,
+                                              "Successfully swapped {} and {}".format(swap1.mention, swap2.mention))
                 else:
                     await client.send_message(message.channel, "Error swapping users")
             else:
@@ -161,8 +179,11 @@ async def on_message(message):
                 content_split = message.content.split(' ')
                 if len(content_split) == 2:
                     num_to_remove = int(content_split[1])
-                    await client.send_message(message.channel, "Number of players per match changed to {}".format(content_split[1]))
-                    print('{}#{} changed number of players to {}'.format(message.author.name, message.author.discriminator, content_split[1]))
+                    await client.send_message(message.channel,
+                                              "Number of players per match changed to {}".format(content_split[1]))
+                    print('{}#{} changed number of players to {}'.format(message.author.name,
+                                                                         message.author.discriminator,
+                                                                         content_split[1]))
                 else:
                     await client.send_message(message.channel, "Error, invalid input for !number command")
             else:
@@ -193,7 +214,7 @@ async def on_message(message):
                 print('{}#{} reset the queue'.format(message.author.name, message.author.discriminator))
             else:
                 await client.send_message(message.channel, 'Only moderators can reset the queue')
-        
+
         if message.content.startswith('!close'):
             user_roles = [str(role).lower() for role in message.author.roles]
             if 'moderator' in user_roles:
@@ -201,7 +222,7 @@ async def on_message(message):
                 await client.send_message(message.channel, 'The queue is now CLOSED! You may no longer join the queue.')
             else:
                 await client.send_message(message.channel, 'You must be a moderator to use this command')
-        
+
         if message.content.startswith('!open'):
             user_roles = [str(role).lower() for role in message.author.roles]
             if 'moderator' in user_roles:
@@ -209,7 +230,7 @@ async def on_message(message):
                 await client.send_message(message.channel, 'The queue is now OPEN! You may join the queue again.')
             else:
                 await client.send_message(message.channel, 'You must be a moderator to use this command')
-        
+
         if message.content.startswith('!logout'):
             user_roles = [str(role).lower() for role in message.author.roles]
             if 'moderator' in user_roles:
