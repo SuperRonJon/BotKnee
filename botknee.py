@@ -52,8 +52,7 @@ async def on_message(message):
                 await client.send_message(message.channel, "Sorry, the queue is currently closed.")
 
         if message.content.startswith('!adduser'):
-            user_roles = [str(role).lower() for role in message.author.roles]
-            if 'moderator' in user_roles:
+            if is_moderator(message.author):
                 if len(message.mentions) != 1:
                     await client.send_message(message.channel, "Invalid number of users mentioned, must be just 1")
                 else:
@@ -69,9 +68,8 @@ async def on_message(message):
             else:
                 await client.send_message(message.channel, "Only moderators can use this command")
 
-        if message.content.startswith('!remuser'):
-            user_roles = [str(role).lower() for role in message.author.roles]
-            if 'moderator' in user_roles:
+        if message.content.startswith('!removeuser'):
+            if is_moderator(message.author):
                 if len(message.mentions) != 1:
                     await client.send_message(message.channel, "Invalid number of users mentioned")
                 else:
@@ -88,8 +86,7 @@ async def on_message(message):
                         await client.send_message(message.channel, "Player not in current queue, cannot remove")
 
         if message.content.startswith('!tofront'):
-            user_roles = [str(role).lower() for role in message.author.roles]
-            if 'moderator' in user_roles:
+            if is_moderator(message.author):
                 if len(message.mentions) != 1:
                     await client.send_message(message.channel, "Too many people mentioned")
                 else:
@@ -107,7 +104,7 @@ async def on_message(message):
                     else:
                         await client.send_message(message.channel, "Player not in queue")
 
-        if message.content.startswith('!remove'):
+        if message.content.startswith('!remove '):
             if message.author in current_queue:
                 current_queue.remove(message.author)
                 await client.send_message(message.channel, "Removed {} from the queue".format(message.author.mention))
@@ -145,8 +142,7 @@ async def on_message(message):
                 await client.send_message(message.channel, "You must be in the queue to swap")
 
         if message.content.startswith('!swapusers'):
-            user_roles = [str(role).lower() for role in message.author.roles]
-            if 'moderator' in user_roles:
+            if is_moderator(message.author):
                 if len(message.mentions) == 2 and message.mentions[0] in current_queue and message.mentions[
                     1] in current_queue:
                     swap1 = message.mentions[0]
@@ -174,8 +170,7 @@ async def on_message(message):
                 await client.send_message(message.channel, 'The queue is currently empty')
 
         if message.content.startswith('!number'):
-            user_roles = [str(role).lower() for role in message.author.roles]
-            if 'moderator' in user_roles:
+            if is_moderator(message.author):
                 content_split = message.content.split(' ')
                 if len(content_split) == 2:
                     num_to_remove = int(content_split[1])
@@ -190,8 +185,7 @@ async def on_message(message):
                 await client.send_message(message.channel, 'You must be a moderator to change this value')
 
         if message.content.startswith('!next'):
-            user_roles = [str(role).lower() for role in message.author.roles]
-            if 'moderator' in user_roles:
+            if is_moderator(message.author):
                 next_users = list()
                 for x in range(num_to_remove):
                     if len(current_queue) > 0:
@@ -207,8 +201,7 @@ async def on_message(message):
                 await client.send_message(message.channel, 'You must be a moderator to get the next users')
 
         if message.content.startswith('!reset'):
-            user_roles = [str(role).lower() for role in message.author.roles]
-            if 'moderator' in user_roles:
+            if is_moderator(message.author):
                 current_queue = list()
                 await client.send_message(message.channel, 'Queue reset')
                 print('{}#{} reset the queue'.format(message.author.name, message.author.discriminator))
@@ -216,28 +209,30 @@ async def on_message(message):
                 await client.send_message(message.channel, 'Only moderators can reset the queue')
 
         if message.content.startswith('!close'):
-            user_roles = [str(role).lower() for role in message.author.roles]
-            if 'moderator' in user_roles:
+            if is_moderator(message.author):
                 is_open = False
                 await client.send_message(message.channel, 'The queue is now CLOSED! You may no longer join the queue.')
             else:
                 await client.send_message(message.channel, 'You must be a moderator to use this command')
 
         if message.content.startswith('!open'):
-            user_roles = [str(role).lower() for role in message.author.roles]
-            if 'moderator' in user_roles:
+            if is_moderator(message.author):
                 is_open = True
                 await client.send_message(message.channel, 'The queue is now OPEN! You may join the queue again.')
             else:
                 await client.send_message(message.channel, 'You must be a moderator to use this command')
 
         if message.content.startswith('!logout'):
-            user_roles = [str(role).lower() for role in message.author.roles]
-            if 'moderator' in user_roles:
+            if is_moderator(message.author):
                 print('Closing....')
                 await client.logout()
     else:
         return
+
+
+def is_moderator(user):
+    user_roles = [str(role).lower() for role in user.roles]
+    return 'moderator' in user_roles
 
 
 client.run(token)
