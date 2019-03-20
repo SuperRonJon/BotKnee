@@ -22,3 +22,5 @@ Discord queue bot for sub games in QuartKnee's stream discord
 !removeuser @[mention] - removes the mentioned user from the current queue
 
 !tofront @[mention] - Moves the mentioned user to the front of the queue
+
+!swapusers @[mention] @[mention] - Swaps the mentioned users in the queue
