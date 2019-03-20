@@ -8,6 +8,8 @@ Discord queue bot for sub games in QuartKnee's stream discord
 
 !list - Lists the usernames of all players currently in the queue, in order
 
+!swap @[user] - Initiates a swap with the tagged user. Both users must tag eachother with this command to swap spots
+
 ## Moderator commands
 !next - Gets the next [number] players out of the queue, displays and mentions them in the channel
 
