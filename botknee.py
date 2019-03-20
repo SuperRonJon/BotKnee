@@ -104,7 +104,7 @@ async def on_message(message):
                     else:
                         await client.send_message(message.channel, "Player not in queue")
 
-        if message.content.startswith('!remove '):
+        if message.content == '!remove':
             if message.author in current_queue:
                 current_queue.remove(message.author)
                 await client.send_message(message.channel, "Removed {} from the queue".format(message.author.mention))
