@@ -1,22 +1,10 @@
 import discord
-import sys
 
 from secret import token
 from config.config_parser import BotConfigParser
 
 
-def get_bot_config():
-    if len(sys.argv) == 2:
-        config_path = sys.argv[1]
-    else:
-        print('Invalid number of arguments')
-        raise IOError
-
-    config_parser = BotConfigParser(config_path)
-    return config_parser.get_config()
-
-
-config = get_bot_config()
+config = BotConfigParser().get_config()
 
 client = discord.Client()
 sub_channel = config.options.channel
@@ -42,12 +30,11 @@ async def on_ready():
     if sub_channel in [channel.name.lower() for channel in channels]:
         print(f'Listening in {sub_channel}')
     else:
-        print(f'Could not find channel #{sub_channel}, terminating...')
-        raise ValueError
+        raise ValueError(f'Could not find channel #{sub_channel} in server {server}')
 
     for server in client.servers:
         if mod_role not in [role.name.lower() for role in server.roles]:
-            print(f'Error: Could not find {config.options.mod_role} role in server {server}')
+            raise ValueError(f'Could not find role {mod_role} in server {server}')
 
 
 @client.event

@@ -7,13 +7,16 @@ from config.botknee_config import BotkneeConfig
 
 class BotConfigParser:
 
-    def __init__(self, file_path):
+    def __init__(self):
+        self.file_path = 'config.ini'
         self.config = configparser.ConfigParser()
-        if os.path.isfile(file_path):
-            self.config.read(file_path)
+        if os.path.isfile(self.file_path):
+            print('Found config file')
+            self.config.read(self.file_path)
         else:
-            print('Could not find config file...')
-            assert os.path.exists(file_path), 'Cannot resolve config path'
+            print('Could not find config file, creating new one')
+            self.create_default_config()
+            self.config.read(self.file_path)
 
     def create_section_map(self, section_title):
         section_map = dict()
@@ -39,3 +42,12 @@ class BotConfigParser:
 
         config_map = BotkneeConfig(botknee_map)
         return config_map
+
+    def create_default_config(self):
+        config = configparser.ConfigParser()
+        config['OPTIONS'] = {"channel": "'sub-games'",
+                             "mod_role": "'moderator'",
+                             "default_number": "3"}
+
+        with open(self.file_path, 'w') as f:
+            config.write(f)
